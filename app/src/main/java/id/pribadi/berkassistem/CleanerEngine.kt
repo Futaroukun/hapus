@@ -170,7 +170,7 @@ object CleanerEngine {
     fun resetDexopt(ctx: Context, log: (String) -> Unit) {
         log("Menjalankan reset kompilasi dexopt (ART compiler)...")
         log("Harap tunggu, proses ini memakan waktu 10-60 detik...")
-        val r = Shell.jalankan("cmd package compile --reset -a", timeoutDetik = 120)
+        val r = Shell.jalankan("cmd package compile --reset -a")
         log("Reset dexopt selesai (kode: ${r.kode})")
         if (r.out.isNotEmpty()) {
             val lines = r.out.lines().take(5)

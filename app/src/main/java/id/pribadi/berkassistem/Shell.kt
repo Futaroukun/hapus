@@ -1,10 +1,11 @@
 package id.pribadi.berkassistem
 
 import rikka.shizuku.Shizuku
-import java.util.concurrent.TimeUnit
 
 /**
- * Shell runner via Shizuku ADB access with timeout & error handling.
+ * Shell runner via Shizuku ADB access.
+ * Menggunakan pembacaan stream & blocking waitFor standar Shizuku
+ * untuk menghindari crash IllegalArgumentException: process hasn't exited.
  */
 object Shell {
 
@@ -18,48 +19,44 @@ object Shell {
                 Array<String>::class.java,
                 String::class.java
             ).apply { isAccessible = true }
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             null
         }
     }
 
-    fun jalankan(perintah: String, timeoutDetik: Long = 60): Hasil {
+    fun jalankan(perintah: String): Hasil {
         val method = newProcessMethod ?: return Hasil(-1, "", "Shizuku newProcess tidak ditemukan")
-        val proses = method.invoke(null, arrayOf("sh", "-c", perintah), null, null) as Process
+        return try {
+            val proses = method.invoke(null, arrayOf("sh", "-c", perintah), null, null) as Process
 
-        var err = ""
-        var out = ""
+            var err = ""
+            val pembacaErr = Thread {
+                try {
+                    err = proses.errorStream.bufferedReader().readText()
+                } catch (_: Throwable) {}
+            }
+            pembacaErr.start()
 
-        val pembacaErr = Thread {
+            val out = try {
+                proses.inputStream.bufferedReader().readText()
+            } catch (_: Throwable) {
+                ""
+            }
+
             try {
-                err = proses.errorStream.bufferedReader().readText()
+                pembacaErr.join(3000)
             } catch (_: Throwable) {}
+
+            val kode = try {
+                proses.waitFor()
+            } catch (_: Throwable) {
+                0
+            }
+
+            Hasil(kode, out.trim(), err.trim())
+        } catch (e: Throwable) {
+            val msg = e.cause?.message ?: e.message ?: "Unknown shell error"
+            Hasil(-1, "", msg)
         }
-        val pembacaOut = Thread {
-            try {
-                out = proses.inputStream.bufferedReader().readText()
-            } catch (_: Throwable) {}
-        }
-
-        pembacaErr.start()
-        pembacaOut.start()
-
-        val selesai = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            proses.waitFor(timeoutDetik, TimeUnit.SECONDS)
-        } else {
-            proses.waitFor()
-            true
-        }
-
-        if (!selesai) {
-            proses.destroy()
-            return Hasil(-1, out.trim(), "Proses melewati batas waktu (${timeoutDetik} detik)")
-        }
-
-        pembacaErr.join(1000)
-        pembacaOut.join(1000)
-
-        val kode = try { proses.exitValue() } catch (_: Throwable) { 0 }
-        return Hasil(kode, out.trim(), err.trim())
     }
 }
