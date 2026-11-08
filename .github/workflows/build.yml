@@ -1,0 +1,61 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cek proyek.zip
+        id: cek
+        run: |
+          if [ -f proyek.zip ]; then
+            unzip -q -o proyek.zip -d proyek
+            echo "ada=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ada=false" >> "$GITHUB_OUTPUT"
+            echo "proyek.zip belum diunggah, build dilewati."
+          fi
+
+      - uses: actions/setup-java@v4
+        if: steps.cek.outputs.ada == 'true'
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.cek.outputs.ada == 'true'
+        with:
+          gradle-version: "8.7"
+
+      - name: Build debug APK
+        if: steps.cek.outputs.ada == 'true'
+        working-directory: proyek
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        if: steps.cek.outputs.ada == 'true'
+        with:
+          name: RuangLega-apk
+          path: proyek/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Terbitkan di Releases
+        if: steps.cek.outputs.ada == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2.0-build${{ github.run_number }}
+          name: Ruang Lega v2.0 (build ${{ github.run_number }})
+          body: |
+            Ruang Lega v2.0 No-Slop Edition
+            - Desain UI baru: Dark slate, storage meter, indikator Shizuku real-time, terminal console interaktif.
+            - Pembersihan menyeluruh: Cache internal (/data/data/*/cache), eksternal, DCIM/.thumbnails, dan junk media.
+            - Mode checklist: Scan ukuran per kategori sebelum eksekusi pembersihan.
+            - Universal: Kompatibel dengan semua merek Android ber-Shizuku (dengan fitur otomatis untuk MIUI/HyperOS).
+          files: proyek/app/build/outputs/apk/debug/app-debug.apk
