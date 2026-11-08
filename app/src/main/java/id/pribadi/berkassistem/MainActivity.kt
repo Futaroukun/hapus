@@ -35,13 +35,20 @@ class MainActivity : Activity() {
     private lateinit var tvFreeStorage: TextView
     private lateinit var tvTotalStorage: TextView
 
+    private lateinit var btnLargeFiles: Button
+    private lateinit var btnBoostRam: Button
+
     private lateinit var cbCache: CheckBox
     private lateinit var cbMedia: CheckBox
+    private lateinit var cbCorpses: CheckBox
+    private lateinit var cbApks: CheckBox
     private lateinit var cbLogs: CheckBox
     private lateinit var cbDexopt: CheckBox
 
     private lateinit var tvSizeCache: TextView
     private lateinit var tvSizeMedia: TextView
+    private lateinit var tvSizeCorpses: TextView
+    private lateinit var tvSizeApks: TextView
     private lateinit var tvSizeLogs: TextView
 
     private lateinit var btnScan: Button
@@ -99,13 +106,20 @@ class MainActivity : Activity() {
         tvFreeStorage = findViewById(R.id.tv_free_storage)
         tvTotalStorage = findViewById(R.id.tv_total_storage)
 
+        btnLargeFiles = findViewById(R.id.btn_large_files)
+        btnBoostRam = findViewById(R.id.btn_boost_ram)
+
         cbCache = findViewById(R.id.cb_cache)
         cbMedia = findViewById(R.id.cb_media)
+        cbCorpses = findViewById(R.id.cb_corpses)
+        cbApks = findViewById(R.id.cb_apks)
         cbLogs = findViewById(R.id.cb_logs)
         cbDexopt = findViewById(R.id.cb_dexopt)
 
         tvSizeCache = findViewById(R.id.tv_size_cache)
         tvSizeMedia = findViewById(R.id.tv_size_media)
+        tvSizeCorpses = findViewById(R.id.tv_size_corpses)
+        tvSizeApks = findViewById(R.id.tv_size_apks)
         tvSizeLogs = findViewById(R.id.tv_size_logs)
 
         btnScan = findViewById(R.id.btn_scan)
@@ -124,6 +138,41 @@ class MainActivity : Activity() {
     private fun setupListeners() {
         tvShizukuPill.setOnClickListener {
             handleShizukuPillClick()
+        }
+
+        btnLargeFiles.setOnClickListener {
+            if (!isShizukuReady()) {
+                appendLog("Shizuku belum siap. Aktifkan Shizuku terlebih dahulu.")
+                return@setOnClickListener
+            }
+            setBusy(true, "Memindai berkas besar...")
+            executor.execute {
+                try {
+                    CleanerEngine.scanLargeFiles(this) { appendLog(it) }
+                } catch (e: Throwable) {
+                    appendLog("Gagal memindai berkas besar: ${e.message}")
+                } finally {
+                    setBusy(false)
+                }
+            }
+        }
+
+        btnBoostRam.setOnClickListener {
+            if (!isShizukuReady()) {
+                appendLog("Shizuku belum siap. Aktifkan Shizuku terlebih dahulu.")
+                return@setOnClickListener
+            }
+            setBusy(true, "Melegakan memori RAM...")
+            executor.execute {
+                try {
+                    CleanerEngine.legakanRam(this) { appendLog(it) }
+                    runOnUiThread { Toast.makeText(this, "RAM berhasil dilegakan", Toast.LENGTH_SHORT).show() }
+                } catch (e: Throwable) {
+                    appendLog("Gagal melegakan RAM: ${e.message}")
+                } finally {
+                    setBusy(false)
+                }
+            }
         }
 
         btnScan.setOnClickListener {
@@ -213,8 +262,12 @@ class MainActivity : Activity() {
         runOnUiThread {
             btnScan.isEnabled = !busy
             btnClean.isEnabled = !busy
+            btnLargeFiles.isEnabled = !busy
+            btnBoostRam.isEnabled = !busy
             cbCache.isEnabled = !busy
             cbMedia.isEnabled = !busy
+            cbCorpses.isEnabled = !busy
+            cbApks.isEnabled = !busy
             cbLogs.isEnabled = !busy
             cbDexopt.isEnabled = !busy
 
@@ -243,30 +296,32 @@ class MainActivity : Activity() {
     }
 
     private fun startScan() {
-        setBusy(true, "Memindai kapasitas sampah...")
-        appendLog("=== MULAI PEMINDAIAN ===")
+        setBusy(true, "Memindai estimasi kapasitas sampah...")
+        appendLog("=== MULAI PEMINDAIAN LENGKAP ===")
 
         executor.execute {
             try {
                 val sizeCache = CleanerEngine.hitungEstimasiCache(this)
-                runOnUiThread {
-                    tvSizeCache.text = Formatter.formatFileSize(this, sizeCache)
-                }
+                runOnUiThread { tvSizeCache.text = Formatter.formatFileSize(this, sizeCache) }
                 appendLog("Estimasi cache aplikasi: ${Formatter.formatFileSize(this, sizeCache)}")
 
                 val sizeMedia = CleanerEngine.hitungEstimasiMediaJunk()
-                runOnUiThread {
-                    tvSizeMedia.text = Formatter.formatFileSize(this, sizeMedia)
-                }
+                runOnUiThread { tvSizeMedia.text = Formatter.formatFileSize(this, sizeMedia) }
                 appendLog("Estimasi media junk & thumbnails: ${Formatter.formatFileSize(this, sizeMedia)}")
 
+                val sizeCorpses = CleanerEngine.hitungEstimasiCorpses(this)
+                runOnUiThread { tvSizeCorpses.text = Formatter.formatFileSize(this, sizeCorpses) }
+                appendLog("Estimasi sisa aplikasi terhapus: ${Formatter.formatFileSize(this, sizeCorpses)}")
+
+                val sizeApks = CleanerEngine.hitungEstimasiApks()
+                runOnUiThread { tvSizeApks.text = Formatter.formatFileSize(this, sizeApks) }
+                appendLog("Estimasi file APK di Download: ${Formatter.formatFileSize(this, sizeApks)}")
+
                 val sizeLogs = CleanerEngine.hitungEstimasiLog()
-                runOnUiThread {
-                    tvSizeLogs.text = Formatter.formatFileSize(this, sizeLogs)
-                }
+                runOnUiThread { tvSizeLogs.text = Formatter.formatFileSize(this, sizeLogs) }
                 appendLog("Estimasi log sistem: ${Formatter.formatFileSize(this, sizeLogs)}")
 
-                val totalEstimasi = sizeCache + sizeMedia + sizeLogs
+                val totalEstimasi = sizeCache + sizeMedia + sizeCorpses + sizeApks + sizeLogs
                 appendLog("Total potensi pembebasan ruang: ${Formatter.formatFileSize(this, totalEstimasi)}")
             } catch (e: Throwable) {
                 appendLog("Gagal memindai: ${e.message}")
@@ -282,6 +337,8 @@ class MainActivity : Activity() {
         val items = mutableListOf<String>()
         if (cbCache.isChecked) items.add("• Cache Aplikasi (Internal & Eksternal)")
         if (cbMedia.isChecked) items.add("• Thumbnail & Media Sampah")
+        if (cbCorpses.isChecked) items.add("• Sisa Aplikasi (App Corpses)")
+        if (cbApks.isChecked) items.add("• File APK di Download")
         if (cbLogs.isChecked) items.add("• Log Sistem & Buffer Logcat")
         if (cbDexopt.isChecked) items.add("• Reset Kompilasi Dexopt (ART)")
 
@@ -292,7 +349,7 @@ class MainActivity : Activity() {
 
         AlertDialog.Builder(this)
             .setTitle("Konfirmasi Pembersihan")
-            .setMessage("Target yang akan dibersihkan:\n\n" + items.joinToString("\n") + "\n\nLanjutkan?")
+            .setMessage("Target yang akan dibersihkan:\n\n" + items.joinToString("\n") + "\n\nLanjutkan pembersihan?")
             .setPositiveButton("Bersihkan") { _, _ ->
                 executeCleaning()
             }
@@ -306,6 +363,8 @@ class MainActivity : Activity() {
 
         val doCache = cbCache.isChecked
         val doMedia = cbMedia.isChecked
+        val doCorpses = cbCorpses.isChecked
+        val doApks = cbApks.isChecked
         val doLogs = cbLogs.isChecked
         val doDexopt = cbDexopt.isChecked
 
@@ -317,6 +376,12 @@ class MainActivity : Activity() {
                 }
                 if (doMedia) {
                     CleanerEngine.bersihkanMediaJunk(this) { appendLog(it) }
+                }
+                if (doCorpses) {
+                    CleanerEngine.bersihkanAppCorpses(this) { appendLog(it) }
+                }
+                if (doApks) {
+                    CleanerEngine.bersihkanOrphanApks(this) { appendLog(it) }
                 }
                 if (doLogs) {
                     CleanerEngine.bersihkanLog(this) { appendLog(it) }

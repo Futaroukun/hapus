@@ -6,21 +6,25 @@ Dirancang dengan antarmuka **No-Slop** (bersih, fungsional, kontras tinggi, hema
 
 ---
 
-## ⚡ Fitur Utama v2.0
+## ⚡ Fitur Utama v2.1
 
-* **Universal & Otomatis**: Berjalan di semua perangkat Android 8.0+ (Samsung, Xiaomi/POCO, OPPO, Vivo, Realme, Pixel, dll). Deteksi otomatis perangkat MIUI/HyperOS untuk log vendor.
+* **Universal & Otomatis**: Berjalan di semua perangkat Android 8.0+ (Samsung, Xiaomi/POCO, OPPO, Vivo, Realme, Pixel, dll).
 * **Pembersihan Cache Ganda (Internal + Eksternal)**:
   * Memangkas cache sistem (`pm trim-caches 999G`).
   * Menyapu bersih subfolder cache eksternal (`/sdcard/Android/data/*/cache/`).
   * Mengosongkan cache internal aplikasi boros (`/data/data/*/cache/` & `code_cache`).
+* **Pembersihan Sisa Aplikasi (App Corpses)**:
+  * Memindai dan menghapus folder tertinggal di `Android/data` & `Android/obb` dari aplikasi yang sudah pernah di-uninstall.
+* **Pembersihan Berkas APK Installer**:
+  * Menghapus file `.apk` mentah yang menumpuk di folder `Download`.
 * **Pembersihan Thumbnail & Media Junk**:
-  * Mengosongkan folder thumbnail yang sering membengkak puluhan GB (`/sdcard/DCIM/.thumbnails`, `Pictures/.thumbnails`, dll).
-  * Membersihkan berkas sampah tersembunyi (`.trashed`).
+  * Mengosongkan folder thumbnail yang sering membengkak puluhan GB (`/sdcard/DCIM/.thumbnails`, `Pictures/.thumbnails`, dll) serta sampah `.trashed`.
 * **Pembersihan Log Sistem**:
-  * Mengosongkan buffer memori RAM logcat (`logcat -b all -c`).
-  * Membersihkan folder debug log vendor (seperti `/sdcard/MIUI/debug_log`).
-* **Reset Kompilasi Dexopt (ART)** *(Opsional)*:
-  * Mengembalikan artefak kompilasi aplikasi ke bawaan (`cmd package compile --reset -a`).
+  * Mengosongkan buffer memori RAM logcat (`logcat -b all -c`) & log debug vendor.
+* **Alat Cepat Tambahan**:
+  * **Cek Berkas >100MB**: Memindai dan menampilkan daftar 25 file terbesar di internal storage.
+  * **Legakan RAM**: Menghentikan paksa (*force-stop*) aplikasi pihak ketiga yang berjalan di background.
+  * **Reset Kompilasi Dexopt (ART)**: Opsional untuk mereset kompilasi aplikasi.
 * **Panel Kendali & Konsol Live**:
   * Storage Meter Bar real-time dengan persentase.
   * Pill status Shizuku interaktif (Hijau = Siap, Kuning = Perlu Izin, Merah = Nonaktif).

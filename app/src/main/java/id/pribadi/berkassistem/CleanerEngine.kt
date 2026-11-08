@@ -5,20 +5,10 @@ import android.os.Build
 import android.os.Environment
 import android.os.StatFs
 import android.text.format.Formatter
-import java.io.File
 
 object CleanerEngine {
 
     data class DiskInfo(val totalBytes: Long, val freeBytes: Long, val usedBytes: Long)
-
-    data class TargetKategori(
-        val id: String,
-        val judul: String,
-        val deskripsi: String,
-        var estimasiByte: Long = 0L,
-        var terpilih: Boolean = true,
-        val perluPerhatian: Boolean = false
-    )
 
     fun getDiskInfo(): DiskInfo {
         val path = Environment.getDataDirectory().path
@@ -49,7 +39,7 @@ object CleanerEngine {
         }.filter { it.second > 0L }
     }
 
-    // ================= SCANNING =================
+    // ================= SCAN ESTIMASI =================
 
     fun hitungEstimasiCache(ctx: Context): Long {
         var total = 0L
@@ -77,6 +67,14 @@ object CleanerEngine {
         return total
     }
 
+    fun hitungEstimasiCorpses(ctx: Context): Long {
+        return scanAppCorpses(ctx).sumOf { it.second }
+    }
+
+    fun hitungEstimasiApks(): Long {
+        return scanOrphanApks().sumOf { it.second }
+    }
+
     fun hitungEstimasiLog(): Long {
         var total = 0L
         if (isXiaomiDevice()) {
@@ -88,7 +86,81 @@ object CleanerEngine {
         return total
     }
 
-    // ================= PEMBERSIHAN =================
+    // ================= PEMBERSIH APP CORPSES (SISA UNINSTALL) =================
+
+    fun scanAppCorpses(ctx: Context): List<Pair<String, Long>> {
+        val installed = Shell.jalankan("pm list packages").out.lines()
+            .map { it.removePrefix("package:").trim() }
+            .filter { it.isNotEmpty() }
+            .toSet()
+
+        val dataDirs = Shell.jalankan("ls -d /sdcard/Android/data/* /sdcard/Android/obb/* 2>/dev/null").out.lines()
+            .filter { it.startsWith("/") }
+
+        val corpses = mutableListOf<Pair<String, Long>>()
+        for (dir in dataDirs) {
+            val pkg = dir.substringAfterLast("/")
+            if (pkg.contains(".") && !installed.contains(pkg)) {
+                val size = ukuranFolder(dir)
+                if (size > 0L) {
+                    corpses.add(Pair(dir, size))
+                }
+            }
+        }
+        return corpses
+    }
+
+    fun bersihkanAppCorpses(ctx: Context, log: (String) -> Unit): Long {
+        val sebelum = getDiskInfo().freeBytes
+        log("Mencari berkas sisa aplikasi yang sudah di-uninstall...")
+        val corpses = scanAppCorpses(ctx)
+        if (corpses.isEmpty()) {
+            log("  - Berkas sisa aplikasi: Bersih (0 B)")
+            return 0L
+        }
+        var count = 0
+        for ((dir, size) in corpses) {
+            val pkg = dir.substringAfterLast("/")
+            Shell.jalankan("rm -rf '$dir' 2>/dev/null")
+            log("  - Dihapus sisa $pkg (${Formatter.formatFileSize(ctx, size)})")
+            count++
+        }
+        val sesudah = getDiskInfo().freeBytes
+        val didapat = (sesudah - sebelum).coerceAtLeast(0L)
+        log("Selesai membersihkan $count sisa aplikasi. Bebas: ${Formatter.formatFileSize(ctx, didapat)}")
+        return didapat
+    }
+
+    // ================= PEMBERSIH INSTALLER APK MENTAH =================
+
+    fun scanOrphanApks(): List<Pair<String, Long>> {
+        val lines = Shell.jalankan("find /sdcard/Download -maxdepth 3 -type f -name '*.apk' 2>/dev/null").out.lines()
+            .filter { it.startsWith("/") }
+        return lines.map { Pair(it, ukuranFolder(it)) }.filter { it.second > 0L }
+    }
+
+    fun bersihkanOrphanApks(ctx: Context, log: (String) -> Unit): Long {
+        val sebelum = getDiskInfo().freeBytes
+        log("Membersihkan installer APK di folder Download...")
+        val apks = scanOrphanApks()
+        if (apks.isEmpty()) {
+            log("  - Berkas APK installer: Bersih (0 B)")
+            return 0L
+        }
+        var count = 0
+        for ((apk, size) in apks) {
+            val name = apk.substringAfterLast("/")
+            Shell.jalankan("rm -f '$apk' 2>/dev/null")
+            log("  - Dihapus installer: $name (${Formatter.formatFileSize(ctx, size)})")
+            count++
+        }
+        val sesudah = getDiskInfo().freeBytes
+        val didapat = (sesudah - sebelum).coerceAtLeast(0L)
+        log("Selesai membersihkan $count file APK. Bebas: ${Formatter.formatFileSize(ctx, didapat)}")
+        return didapat
+    }
+
+    // ================= PEMBERSIHAN STANDAR =================
 
     fun bersihkanCacheAplikasi(ctx: Context, log: (String) -> Unit): Long {
         val sebelum = getDiskInfo().freeBytes
@@ -99,7 +171,7 @@ object CleanerEngine {
 
         val extFolders = daftarFolderBerisi("ls -d /sdcard/Android/data/*/cache 2>/dev/null")
         var countExt = 0
-        for ((folder, size) in extFolders) {
+        for ((folder, _) in extFolders) {
             Shell.jalankan("rm -rf '$folder'/* '$folder'/.[!.]* 2>/dev/null")
             countExt++
         }
@@ -110,7 +182,7 @@ object CleanerEngine {
 
         val sesudah = getDiskInfo().freeBytes
         val didapat = (sesudah - sebelum).coerceAtLeast(0L)
-        log("Selesai membersihkan cache. Ruang bebas bertambah: ${Formatter.formatFileSize(ctx, didapat)}")
+        log("Selesai membersihkan cache. Bebas: ${Formatter.formatFileSize(ctx, didapat)}")
         return didapat
     }
 
@@ -169,12 +241,48 @@ object CleanerEngine {
 
     fun resetDexopt(ctx: Context, log: (String) -> Unit) {
         log("Menjalankan reset kompilasi dexopt (ART compiler)...")
-        log("Harap tunggu, proses ini memakan waktu 10-60 detik...")
+        log("Harap tunggu, proses ini memakan waktu beberapa saat...")
         val r = Shell.jalankan("cmd package compile --reset -a")
         log("Reset dexopt selesai (kode: ${r.kode})")
         if (r.out.isNotEmpty()) {
             val lines = r.out.lines().take(5)
             lines.forEach { log("  $it") }
         }
+    }
+
+    // ================= UTILITAS TAMBAHAN: LARGE FILES & BOOST RAM =================
+
+    fun scanLargeFiles(ctx: Context, log: (String) -> Unit) {
+        log("Memindai berkas besar (>100 MB) di penyimpanan internal...")
+        val out = Shell.jalankan("find /sdcard -type f -size +100M -exec du -sk {} + 2>/dev/null | sort -rn | head -n 25").out
+        val lines = out.lines().filter { it.isNotBlank() }
+        if (lines.isEmpty()) {
+            log("  - Tidak ditemukan berkas di atas 100 MB.")
+            return
+        }
+        log("Top berkas terbesar (>100 MB):")
+        for (l in lines) {
+            val parts = l.trim().split(Regex("\\s+"), limit = 2)
+            val kb = parts.getOrNull(0)?.toLongOrNull() ?: 0L
+            val path = parts.getOrNull(1) ?: ""
+            if (path.isNotEmpty()) {
+                val formattedSize = Formatter.formatFileSize(ctx, kb * 1024L).padStart(10)
+                log("  $formattedSize  $path")
+            }
+        }
+    }
+
+    fun legakanRam(ctx: Context, log: (String) -> Unit) {
+        log("Melegakan RAM: Menghentikan aplikasi pihak ketiga di latar belakang...")
+        val thirdParty = Shell.jalankan("pm list packages -3").out.lines()
+            .map { it.removePrefix("package:").trim() }
+            .filter { it.isNotEmpty() && it != ctx.packageName }
+
+        var count = 0
+        for (pkg in thirdParty) {
+            Shell.jalankan("am force-stop $pkg")
+            count++
+        }
+        log("Berhasil force-stop $count aplikasi pihak ketiga di background.")
     }
 }
