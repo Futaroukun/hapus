@@ -3,7 +3,7 @@
     android:id="@+id/main_scroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0B0D12"
+    android:background="#090C10"
     android:fillViewport="true">
 
     <LinearLayout
@@ -12,13 +12,13 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Top Header -->
+        <!-- App Header Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:layout_marginBottom="14dp">
+            android:layout_marginBottom="16dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -30,21 +30,21 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="RUANG LEGA"
-                    android:textColor="#F1F5F9"
-                    android:textSize="20sp"
+                    android:textColor="#F8FAFC"
+                    android:textSize="21sp"
                     android:textStyle="bold"
-                    android:letterSpacing="0.05" />
+                    android:letterSpacing="0.04" />
 
                 <TextView
-                    android:id="@+id/tv_device_info"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Perangkat: -"
-                    android:textColor="#94A3B8"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="1dp"
+                    android:text="Universal System Sweeper • No-Slop v2.2"
+                    android:textColor="#64748B"
+                    android:textSize="11sp" />
             </LinearLayout>
 
+            <!-- Shizuku Status Pill -->
             <TextView
                 android:id="@+id/tv_shizuku_pill"
                 android:layout_width="wrap_content"
@@ -60,126 +60,204 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Storage Card -->
+        <!-- Device & Storage Hero Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_card"
+            android:background="@drawable/bg_hero_card"
             android:orientation="vertical"
             android:padding="16dp"
             android:layout_marginBottom="14dp">
 
+            <!-- Device Specs Subtitle -->
+            <TextView
+                android:id="@+id/tv_device_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Memuat data perangkat..."
+                android:textColor="#06B6D4"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.03"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Free Storage Big Value -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="bottom"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:id="@+id/tv_free_storage"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="PENYIMPANAN INTERNAL"
+                    android:text="-- GB"
+                    android:textColor="#10B981"
+                    android:textSize="28sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="Ruang Bebas"
                     android:textColor="#94A3B8"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.05" />
+                    android:textSize="13sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/tv_storage_pct"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0%"
+                    android:layout_marginBottom="4dp"
+                    android:text="0% Terpakai"
                     android:textColor="#F1F5F9"
-                    android:textSize="14sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <!-- Dual Storage Gauge Bar -->
             <ProgressBar
                 android:id="@+id/pb_storage"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_height="8dp"
+                android:layout_height="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="12dp"
                 android:max="100"
                 android:progress="0"
                 android:progressDrawable="@drawable/storage_progress" />
 
+            <!-- Total Info Footer -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tv_free_storage"
+                    android:id="@+id/tv_total_storage"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Ruang Bebas: -"
-                    android:textColor="#10B981"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tv_total_storage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Total: -"
+                    android:text="Total Kapasitas: -"
                     android:textColor="#64748B"
                     android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tv_est_total_junk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Potensi Bersih: -"
+                    android:textColor="#F59E0B"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Quick Tools Row -->
+        <!-- Developer Quick Tools (2x2 Grid) -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ALAT DIAGNOSTIK &amp; PERFORMA"
+            android:textColor="#94A3B8"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:layout_marginBottom="8dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_marginBottom="14dp">
 
-            <Button
-                android:id="@+id/btn_large_files"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:layout_marginRight="6dp"
-                android:background="@drawable/bg_btn_secondary"
-                android:text="Cek Berkas >100MB"
-                android:textColor="#94A3B8"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp">
 
-            <Button
-                android:id="@+id/btn_boost_ram"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:layout_marginLeft="6dp"
-                android:background="@drawable/bg_btn_secondary"
-                android:text="Legakan RAM"
-                android:textColor="#94A3B8"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                <Button
+                    android:id="@+id/btn_large_files"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="4dp"
+                    android:background="@drawable/bg_btn_tool"
+                    android:text="🔍 Berkas >50MB"
+                    android:textColor="#CBD5E1"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_boost_ram"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="4dp"
+                    android:background="@drawable/bg_btn_tool"
+                    android:text="⚡ Legakan RAM"
+                    android:textColor="#CBD5E1"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_clean_empty_dirs"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="4dp"
+                    android:background="@drawable/bg_btn_tool"
+                    android:text="📂 Hapus Dir Kosong"
+                    android:textColor="#CBD5E1"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_disk_info"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="4dp"
+                    android:background="@drawable/bg_btn_tool"
+                    android:text="📊 Info Partisi"
+                    android:textColor="#CBD5E1"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Categories Section Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TARGET PEMBERSIHAN"
+            android:text="TARGET PEMBERSIHAN SISTEM"
             android:textColor="#94A3B8"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.05"
             android:layout_marginBottom="8dp" />
 
-        <!-- Card Item 1: Cache Apps -->
+        <!-- Card 1: Cache Apps -->
         <LinearLayout
+            android:id="@+id/card_cache"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_card"
             android:orientation="vertical"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_marginBottom="6dp">
 
             <LinearLayout
@@ -193,7 +271,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Cache Aplikasi Lengkap"
+                    android:text="Cache Aplikasi Universal"
                     android:textColor="#F1F5F9"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -207,9 +285,14 @@
                     android:id="@+id/tv_size_cache"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_emerald"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
                     android:text="Hitung..."
-                    android:textColor="#10B981"
-                    android:textSize="12sp"
+                    android:textColor="#34D399"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -217,67 +300,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="32dp"
-                android:text="Pangkas cache internal (/data/data/*/cache) &amp; eksternal Android/data."
+                android:text="Sapu bersih cache internal (/data/data/*/cache) &amp; eksternal Android/data."
                 android:textColor="#64748B"
                 android:textSize="11sp" />
         </LinearLayout>
 
-        <!-- Card Item 2: Media Junk -->
+        <!-- Card 2: App Corpses -->
         <LinearLayout
+            android:id="@+id/card_corpses"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_card"
             android:orientation="vertical"
-            android:padding="10dp"
-            android:layout_marginBottom="6dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <CheckBox
-                    android:id="@+id/cb_media"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="Thumbnail &amp; Media Sampah"
-                    android:textColor="#F1F5F9"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1" />
-
-                <TextView
-                    android:id="@+id/tv_size_media"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hitung..."
-                    android:textColor="#10B981"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="32dp"
-                android:text="Hapus folder DCIM/.thumbnails, cache galeri bawaan, dan .trashed."
-                android:textColor="#64748B"
-                android:textSize="11sp" />
-        </LinearLayout>
-
-        <!-- Card Item 3: App Corpses (NEW) -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_card"
-            android:orientation="vertical"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_marginBottom="6dp">
 
             <LinearLayout
@@ -291,7 +326,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Sisa Aplikasi (App Corpses)"
+                    android:text="Sisa Uninstall (App Corpses)"
                     android:textColor="#F1F5F9"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -305,9 +340,14 @@
                     android:id="@+id/tv_size_corpses"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_emerald"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
                     android:text="Hitung..."
-                    android:textColor="#10B981"
-                    android:textSize="12sp"
+                    android:textColor="#34D399"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -315,18 +355,129 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="32dp"
-                android:text="Folder tertinggal di Android/data &amp; obb dari aplikasi yang sudah di-uninstall."
+                android:text="Folder terbengkalai di Android/data &amp; obb dari aplikasi yang sudah dihapus."
                 android:textColor="#64748B"
                 android:textSize="11sp" />
         </LinearLayout>
 
-        <!-- Card Item 4: APK Installers (NEW) -->
+        <!-- Card 3: Thumbnails & Media Junk -->
         <LinearLayout
+            android:id="@+id/card_media"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_card"
             android:orientation="vertical"
-            android:padding="10dp"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_media"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Thumbnails &amp; Cache Galeri"
+                    android:textColor="#F1F5F9"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tv_size_media"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_emerald"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="Hitung..."
+                    android:textColor="#34D399"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="32dp"
+                android:text="Folder DCIM/.thumbnails, cache galeri vendor (MIUI/Samsung/Oppo/Vivo), dan .trashed."
+                android:textColor="#64748B"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Card 4: Chat Media Junk (WA & Telegram) -->
+        <LinearLayout
+            android:id="@+id/card_chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:layout_marginBottom="6dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="Media Chat (WA &amp; Telegram)"
+                    android:textColor="#F1F5F9"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tv_size_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_emerald"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
+                    android:text="Hitung..."
+                    android:textColor="#34D399"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="32dp"
+                android:text="Cache stiker WhatsApp, status lama, dan cache media perpesanan Telegram."
+                android:textColor="#64748B"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Card 5: APK Installers -->
+        <LinearLayout
+            android:id="@+id/card_apks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="12dp"
             android:layout_marginBottom="6dp">
 
             <LinearLayout
@@ -354,9 +505,14 @@
                     android:id="@+id/tv_size_apks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_emerald"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
                     android:text="Hitung..."
-                    android:textColor="#10B981"
-                    android:textSize="12sp"
+                    android:textColor="#34D399"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -364,18 +520,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="32dp"
-                android:text="File .apk installer yang tertinggal di folder Download."
+                android:text="File installer .apk yang tertinggal dan tidak terpakai lagi di folder Download."
                 android:textColor="#64748B"
                 android:textSize="11sp" />
         </LinearLayout>
 
-        <!-- Card Item 5: System Logs -->
+        <!-- Card 6: Multi-Vendor System Logs -->
         <LinearLayout
+            android:id="@+id/card_logs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_card"
             android:orientation="vertical"
-            android:padding="10dp"
+            android:padding="12dp"
             android:layout_marginBottom="6dp">
 
             <LinearLayout
@@ -389,7 +546,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Log Sistem &amp; Logcat Buffer"
+                    android:text="Log Sistem Multi-Vendor"
                     android:textColor="#F1F5F9"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -403,9 +560,14 @@
                     android:id="@+id/tv_size_logs"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_emerald"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
                     android:text="Hitung..."
-                    android:textColor="#10B981"
-                    android:textSize="12sp"
+                    android:textColor="#34D399"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -413,19 +575,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="32dp"
-                android:text="Kosongkan buffer logcat RAM &amp; folder debug_log vendor."
+                android:text="Kosongkan buffer logcat RAM &amp; log debug vendor (Xiaomi, Samsung, Oppo, Vivo, dll)."
                 android:textColor="#64748B"
                 android:textSize="11sp" />
         </LinearLayout>
 
-        <!-- Card Item 6: Dexopt (Optional) -->
+        <!-- Card 7: Dexopt ART Compiler (Optional) -->
         <LinearLayout
+            android:id="@+id/card_dexopt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_card"
             android:orientation="vertical"
-            android:padding="10dp"
-            android:layout_marginBottom="14dp">
+            android:padding="12dp"
+            android:layout_marginBottom="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -438,7 +601,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="false"
-                    android:text="Reset Kompilasi Dexopt"
+                    android:text="Reset Kompilasi Dexopt (ART)"
                     android:textColor="#F1F5F9"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -451,6 +614,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_amber"
+                    android:paddingLeft="8dp"
+                    android:paddingTop="3dp"
+                    android:paddingRight="8dp"
+                    android:paddingBottom="3dp"
                     android:text="Opsional"
                     android:textColor="#F59E0B"
                     android:textSize="11sp"
@@ -461,26 +629,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="32dp"
-                android:text="Reset artefak kompilasi aplikasi ke bawaan. Gunakan jika ruang sangat minim."
+                android:text="Reset hasil kompilasi aplikasi ke bawaan. Gunakan hanya jika ruang sangat minim."
                 android:textColor="#64748B"
                 android:textSize="11sp" />
         </LinearLayout>
 
-        <!-- Main Action Buttons -->
+        <!-- Primary Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="14dp">
 
             <Button
                 android:id="@+id/btn_scan"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:layout_marginRight="8dp"
                 android:background="@drawable/bg_btn_secondary"
-                android:text="Pindai Ukuran"
+                android:text="🔍 Pindai Ukuran"
                 android:textColor="#E2E8F0"
                 android:textSize="13sp"
                 android:textStyle="bold" />
@@ -488,11 +656,11 @@
             <Button
                 android:id="@+id/btn_clean"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="50dp"
                 android:layout_weight="1.2"
                 android:background="@drawable/bg_btn_primary"
-                android:text="Bersihkan Terpilih"
-                android:textColor="#0B0D12"
+                android:text="🧹 Bersihkan Terpilih"
+                android:textColor="#062F24"
                 android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -504,7 +672,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="14dp">
 
             <ProgressBar
                 style="?android:attr/progressBarStyleHorizontal"
@@ -516,36 +684,59 @@
                 android:id="@+id/tv_status_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="5dp"
                 android:text="Sedang memproses..."
-                android:textColor="#3B82F6"
-                android:textSize="12sp" />
+                android:textColor="#06B6D4"
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Console Section -->
+        <!-- Terminal Window Console (Professional Design) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/bg_console"
+            android:background="@drawable/bg_terminal_box"
             android:padding="12dp">
 
+            <!-- Window Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="10dp">
+
+                <!-- Mac/Linux style dots -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="● ● ●"
+                    android:textColor="#475569"
+                    android:textSize="10sp"
+                    android:letterSpacing="0.1" />
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="LOG KELUARAN"
-                    android:textColor="#64748B"
+                    android:paddingLeft="10dp"
+                    android:text="TERMINAL KELUARAN"
+                    android:textColor="#94A3B8"
                     android:textSize="11sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.05" />
+
+                <TextView
+                    android:id="@+id/btn_clear_log"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BERSIHKAN"
+                    android:textColor="#64748B"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp" />
 
                 <TextView
                     android:id="@+id/btn_copy_log"
@@ -555,20 +746,20 @@
                     android:textColor="#3B82F6"
                     android:textSize="11sp"
                     android:textStyle="bold"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp" />
+                    android:paddingLeft="6dp"
+                    android:paddingRight="2dp" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_console"
                 android:layout_width="match_parent"
-                android:layout_height="180dp"
+                android:layout_height="200dp"
                 android:typeface="monospace"
                 android:textSize="11sp"
                 android:textColor="#94A3B8"
                 android:scrollbars="vertical"
                 android:textIsSelectable="true"
-                android:text="[Ruang Lega siap]\n" />
+                android:text="[Ruang Lega v2.2 siap]\n" />
         </LinearLayout>
 
     </LinearLayout>
